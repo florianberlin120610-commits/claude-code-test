@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Creator Decision Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #e8e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; min-height: 100vh; }
+  a { color: inherit; text-decoration: none; }
+  button { cursor: pointer; font-family: inherit; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+
+  /* Header */
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .header h1 { font-size: 24px; font-weight: 700; }
+  .header p { color: #6b6b80; font-size: 14px; margin-top: 4px; }
+  .btn-primary { background: #3b82f6; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* Cards */
+  .card { background: #111118; border: 1px solid #2a2a38; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .card-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #6b6b80; text-transform: uppercase; }
+
+  /* Zone 1 */
+  .zone-action { border: 2px solid #22c55e; background: #0f1f0f; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .zone-action .label { color: #22c55e; }
+  .zone-action-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .slot-hint { font-size: 12px; color: #6b6b80; }
+  .zone-action h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .zone-action p { color: #9ca3af; font-size: 14px; margin-bottom: 20px; }
+  .btn-action { background: #22c55e; color: #000; padding: 8px 18px; border-radius: 8px; font-size: 14px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-action:hover { opacity: 0.85; }
+  .slot-info { font-size: 13px; color: #6b6b80; margin-left: 12px; }
+
+  /* Zone 2 */
+  .patterns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  .pattern-col h3 { font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+  .pattern-col.positive h3 { color: #22c55e; }
+  .pattern-col.negative h3 { color: #ef4444; }
+  .pattern-item { background: #1a1a24; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+  .pattern-item.positive { border: 1px solid #22c55e30; }
+  .pattern-item.negative { border: 1px solid #ef444430; }
+  .pattern-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .pattern-name { font-weight: 600; font-size: 14px; }
+  .pattern-dim { color: #6b6b80; font-size: 12px; margin-left: 6px; }
+  .pattern-score.positive { color: #22c55e; font-weight: 700; font-size: 13px; }
+  .pattern-score.negative { color: #ef4444; font-weight: 700; font-size: 13px; }
+  .bar-bg { background: #0a0a0f; border-radius: 4px; height: 4px; overflow: hidden; margin-bottom: 6px; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .pattern-meta { display: flex; justify-content: space-between; font-size: 11px; color: #6b6b80; }
+  .pattern-example { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Zone 3 */
+  .ranking-list { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
+  .ranking-row { display: flex; align-items: center; gap: 12px; background: #1a1a24; border-radius: 8px; padding: 12px 14px; cursor: pointer; transition: opacity 0.15s; }
+  .ranking-row:hover { opacity: 0.85; }
+  .ranking-row.top { border: 1px solid #22c55e30; }
+  .ranking-row.bottom { border: 1px solid #ef444430; }
+  .rank-num { font-weight: 700; width: 28px; flex-shrink: 0; font-size: 15px; }
+  .rank-num.top { color: #22c55e; }
+  .rank-num.bottom { color: #ef4444; }
+  .rank-num.mid { color: #6b6b80; }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-tags { display: flex; gap: 6px; margin-top: 4px; }
+  .tag { background: #1a1a24; border: 1px solid #2a2a38; border-radius: 6px; padding: 2px 8px; font-size: 12px; color: #a0a0b8; }
+  .ranking-row .tag { background: #0a0a0f; }
+  .rank-metrics { display: flex; gap: 16px; align-items: center; flex-shrink: 0; }
+  .rank-views { text-align: right; }
+  .rank-views .num { font-size: 15px; font-weight: 600; }
+  .rank-views .lbl { font-size: 11px; color: #6b6b80; }
+  .score-badge { border-radius: 6px; padding: 2px 10px; font-size: 13px; font-weight: 700; }
+
+  /* Zone 4 */
+  .analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; }
+  .analytic-card { background: #1a1a24; border-radius: 8px; padding: 16px 14px; }
+  .analytic-card .lbl { font-size: 12px; color: #6b6b80; margin-bottom: 6px; }
+  .analytic-card .val { font-size: 22px; font-weight: 700; }
+  .analytic-card .ctx { font-size: 11px; color: #6b6b80; margin-top: 4px; }
+  .slots-list { margin-top: 24px; }
+  .slots-list .lbl { font-size: 13px; color: #6b6b80; font-weight: 600; margin-bottom: 12px; }
+  .slot-row { display: flex; justify-content: space-between; align-items: center; background: #1a1a24; border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; }
+  .slot-row .name { font-size: 14px; }
+  .slot-row .meta { display: flex; gap: 12px; align-items: center; font-size: 12px; color: #6b6b80; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #111118; border: 1px solid #2a2a38; border-radius: 12px; padding: 32px; width: 600px; max-width: 95vw; max-height: 90vh; overflow-y: auto; position: relative; }
+  .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+  .modal-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #6b6b80; font-size: 22px; cursor: pointer; }
+  .modal-close:hover { color: #e8e8f0; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 13px; color: #6b6b80; font-weight: 500; }
+  .form-group input, .form-group select { background: #1a1a24; border: 1px solid #2a2a38; color: #e8e8f0; border-radius: 8px; padding: 10px 14px; font-size: 14px; outline: none; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus { border-color: #3b82f6; }
+  .form-actions { display: flex; gap: 12px; margin-top: 24px; }
+  .btn-save { background: #3b82f6; color: #fff; padding: 12px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; border: none; }
+  .btn-cancel { background: #1a1a24; color: #6b6b80; padding: 12px 20px; border-radius: 8px; font-size: 15px; border: none; }
+  fieldset { border: 1px solid #2a2a38; border-radius: 10px; padding: 20px; margin-bottom: 0; }
+  legend { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6b6b80; padding: 0 8px; }
+  .checkbox-row { display: flex; gap: 24px; align-items: center; }
+  .checkbox-label { display: flex; gap: 8px; align-items: center; font-size: 14px; cursor: pointer; }
+  .checkbox-label input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6; }
+
+  /* Detail modal */
+  .detail-score { display: flex; align-items: center; gap: 24px; border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+  .detail-score .big { font-size: 48px; font-weight: 800; line-height: 1; }
+  .detail-score .sub { font-size: 12px; color: #6b6b80; margin-top: 4px; }
+  .score-bar-bg { background: #0a0a0f; border-radius: 8px; height: 12px; overflow: hidden; flex: 1; }
+  .score-bar-fill { height: 100%; border-radius: 8px; }
+  .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .metric-box { background: #1a1a24; border: 1px solid #2a2a38; border-radius: 8px; padding: 14px 16px; }
+  .metric-box .lbl { font-size: 11px; color: #6b6b80; margin-bottom: 4px; }
+  .metric-box .val { font-size: 20px; font-weight: 700; }
+  .detail-info { background: #1a1a24; border: 1px solid #2a2a38; border-radius: 12px; padding: 20px; }
+  .detail-info h3 { font-size: 13px; color: #6b6b80; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .detail-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .detail-field .lbl { font-size: 11px; color: #6b6b80; margin-bottom: 2px; }
+  .detail-field .val { font-size: 14px; }
+  .status-badge { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+  .status-published { background: #22c55e20; color: #22c55e; border: 1px solid #22c55e40; }
+  .status-draft { background: #3b82f620; color: #3b82f6; border: 1px solid #3b82f640; }
+  .status-scheduled { background: #eab30820; color: #eab308; border: 1px solid #eab30840; }
+
+  .onboarding-hint { text-align: center; padding: 24px 0; color: #6b6b80; }
+  .onboarding-hint p { font-size: 16px; margin-bottom: 8px; }
+  .onboarding-hint small { font-size: 13px; }
+  .progress-bar-outer { background: #1a1a24; border-radius: 99px; height: 6px; margin: 12px auto; max-width: 200px; }
+  .progress-bar-inner { background: #3b82f6; height: 100%; border-radius: 99px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div>
+      <h1>Creator Dashboard</h1>
+      <p id="header-meta">0 Posts · 0 Drafts</p>
+    </div>
+    <button class="btn-primary" onclick="openNewPost()">+ Neuer Post</button>
+  </div>
+
+  <!-- ZONE 1: Next Action -->
+  <div class="zone-action">
+    <div class="zone-action-header">
+      <span class="card-label label">Nächste Aktion</span>
+      <span class="slot-hint" id="next-slot-hint"></span>
+    </div>
+    <h2 id="action-title">Lädt…</h2>
+    <p id="action-reason"></p>
+    <div style="display:flex;align-items:center;">
+      <button class="btn-action" id="action-btn" onclick="handleActionBtn()">→</button>
+      <span class="slot-info" id="action-slot-info"></span>
+    </div>
+  </div>
+
+  <!-- ZONE 2: Patterns -->
+  <div class="card">
+    <span class="card-label">Muster-Intelligence</span>
+    <div id="patterns-content"></div>
+  </div>
+
+  <!-- ZONE 3: Ranking -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span class="card-label">Post-Ranking (Top 10)</span>
+      <span style="font-size:12px;color:#6b6b80;">sortiert nach Hook Score</span>
+    </div>
+    <div class="ranking-list" id="ranking-list"></div>
+  </div>
+
+  <!-- ZONE 4: Analytics -->
+  <div class="card">
+    <span class="card-label">Analytics</span>
+    <div class="analytics-grid" id="analytics-grid"></div>
+    <div class="slots-list" id="slots-list"></div>
+  </div>
+
+</div>
+
+<!-- New Post Modal -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <button class="modal-close" onclick="closeNewPost()">✕</button>
+    <h2>Neuer Post</h2>
+    <form id="form-new" onsubmit="submitPost(event)" style="display:flex;flex-direction:column;gap:20px;">
+      <fieldset>
+        <legend>Basisdaten</legend>
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="form-group full">
+            <label>Titel *</label>
+            <input required name="title" placeholder="z.B. 5 Fehler die dich arm halten">
+          </div>
+          <div class="form-group">
+            <label>Plattform *</label>
+            <select name="platform">
+              <option value="tiktok">TikTok</option>
+              <option value="instagram_reel">Instagram Reel</option>
+              <option value="youtube_short">YouTube Short</option>
+              <option value="youtube_long">YouTube Long</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status *</label>
+            <select name="status">
+              <option value="published">Veröffentlicht</option>
+              <option value="draft">Draft</option>
+              <option value="scheduled">Geplant</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Datum & Uhrzeit *</label>
+            <input type="datetime-local" name="publishedAt">
+          </div>
+          <div class="form-group">
+            <label>Dauer (Sekunden)</label>
+            <input type="number" name="durationSeconds" placeholder="z.B. 45" min="0">
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Hook</legend>
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="form-group">
+            <label>Hook-Typ *</label>
+            <select name="hookType">
+              <option value="number">Number ("5 Fehler…")</option>
+              <option value="pov">POV</option>
+              <option value="question">Frage</option>
+              <option value="shock">Shock</option>
+              <option value="promise">Promise</option>
+              <option value="other">Anderes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Thema *</label>
+            <select name="topicCategory">
+              <option value="money">money</option>
+              <option value="skills">skills</option>
+              <option value="mindset">mindset</option>
+              <option value="algorithm">algorithm</option>
+              <option value="lifestyle">lifestyle</option>
+              <option value="fitness">fitness</option>
+              <option value="business">business</option>
+              <option value="other">other</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Hook-Text (erste 5–7 Wörter)</label>
+            <input name="hookText" placeholder="z.B. 5 Fehler die dich arm…">
+          </div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Metriken</legend>
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="form-group"><label>Views</label><input type="number" name="views" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Likes</label><input type="number" name="likes" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Kommentare</label><input type="number" name="comments" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Shares</label><input type="number" name="shares" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Link Clicks</label><input type="number" name="linkClicks" placeholder="optional" min="0"></div>
+          <div class="form-group"><label>Käufe</label><input type="number" name="purchases" placeholder="optional" min="0"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Extras</legend>
+        <div style="margin-top:14px;" class="checkbox-row">
+          <label class="checkbox-label"><input type="checkbox" name="hasCta"> Hat CTA</label>
+          <label class="checkbox-label"><input type="checkbox" name="isSeries" onchange="toggleSeries(this)"> Teil einer Serie</label>
+        </div>
+        <div id="series-field" style="display:none;margin-top:14px;">
+          <div class="form-group"><label>Serienname</label><input name="seriesName" placeholder="z.B. Creator Habits"></div>
+        </div>
+      </fieldset>
+      <div class="form-actions">
+        <button type="submit" class="btn-save">Post speichern</button>
+        <button type="button" class="btn-cancel" onclick="closeNewPost()">Abbrechen</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const PLATFORMS = { tiktok:"TikTok", instagram_reel:"IG Reel", youtube_short:"YT Short", youtube_long:"YT Long" };
+const WEEKDAYS  = ["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+const DIM_LABEL = { hook_type:"Hook-Typ", topic_category:"Thema", weekday:"Wochentag", platform:"Plattform", duration:"Länge" };
+
+let posts = JSON.parse(localStorage.getItem("creator_posts") || "null");
+
+if (!posts) {
+  // Seed data
+  const seed = [
+    { title:"5 Fehler die dich arm halten", platform:"tiktok", publishedAt:"2026-04-10T18:00", durationSeconds:45, hookType:"number", hookText:"5 Fehler die dich arm", topicCategory:"money", hasCta:true, isSeries:false, views:312000, likes:18400, comments:2100, shares:4300, purchases:14, status:"published" },
+    { title:"POV: Du verdienst 10k online ohne Chef", platform:"instagram_reel", publishedAt:"2026-04-12T20:00", durationSeconds:30, hookType:"pov", hookText:"POV: Du verdienst 10k", topicCategory:"money", hasCta:false, isSeries:false, views:87000, likes:6200, comments:890, shares:1100, purchases:0, status:"published" },
+    { title:"Warum niemand deine Videos schaut", platform:"youtube_short", publishedAt:"2026-04-15T12:00", durationSeconds:58, hookType:"question", hookText:"Warum niemand deine Videos", topicCategory:"algorithm", hasCta:true, isSeries:false, views:54000, likes:3100, comments:440, shares:620, purchases:0, status:"published" },
+    { title:"Diese 3 Skills machen dich unaufhaltsam", platform:"tiktok", publishedAt:"2026-04-17T18:00", durationSeconds:55, hookType:"number", hookText:"Diese 3 Skills machen dich", topicCategory:"skills", hasCta:true, isSeries:false, views:198000, likes:14200, comments:1800, shares:3400, purchases:8, status:"published" },
+    { title:"Der Mindset-Shift der alles verändert hat", platform:"tiktok", publishedAt:"2026-04-19T19:00", durationSeconds:42, hookType:"promise", hookText:"Der Mindset-Shift der alles", topicCategory:"mindset", hasCta:false, isSeries:false, views:76000, likes:5800, comments:720, shares:980, purchases:2, status:"published" },
+    { title:"Niemand redet darüber — der TikTok-Algorithmus 2026", platform:"tiktok", publishedAt:"2026-04-22T17:00", durationSeconds:60, hookType:"shock", hookText:"Niemand redet darüber —", topicCategory:"algorithm", hasCta:true, isSeries:false, views:421000, likes:29000, comments:3800, shares:7200, purchases:21, status:"published" },
+    { title:"7 Habits von Creatorn die 100k+ verdienen", platform:"youtube_short", publishedAt:"2026-04-24T14:00", durationSeconds:58, hookType:"number", hookText:"7 Habits von Creatorn die", topicCategory:"money", hasCta:true, isSeries:true, seriesName:"Creator Habits", views:143000, likes:9800, comments:1200, shares:2100, purchases:5, status:"published" },
+    { title:"POV: Tag 1 als Creator mit 0 Followern", platform:"instagram_reel", publishedAt:"2026-04-26T20:00", durationSeconds:28, hookType:"pov", hookText:"POV: Tag 1 als Creator", topicCategory:"mindset", hasCta:false, isSeries:true, seriesName:"Creator Habits", views:34000, likes:2100, comments:310, shares:450, purchases:0, status:"published" },
+    { title:"Die härteste Wahrheit über Content Creation", platform:"tiktok", publishedAt:"2026-04-29T18:00", durationSeconds:52, hookType:"shock", hookText:"Die härteste Wahrheit über", topicCategory:"mindset", hasCta:false, isSeries:false, views:267000, likes:19500, comments:2600, shares:5100, purchases:0, status:"published" },
+    { title:"Wie ich in 30 Tagen 1000 Follower gewann", platform:"youtube_long", publishedAt:"2026-05-02T16:00", durationSeconds:720, hookType:"promise", hookText:"Wie ich in 30 Tagen", topicCategory:"algorithm", hasCta:true, isSeries:false, views:18000, likes:1100, comments:210, shares:320, purchases:3, status:"published" },
+    { title:"4 Skills die kein Creator dir beibringt", platform:"tiktok", publishedAt:"2026-05-05T18:00", durationSeconds:47, hookType:"number", hookText:"4 Skills die kein Creator", topicCategory:"skills", hasCta:true, isSeries:false, views:389000, likes:27000, comments:3400, shares:6800, purchases:18, status:"published" },
+    { title:"Dein nächster Viral-Post — Hook-Formel erklärt", platform:"tiktok", publishedAt:"2026-05-08T19:00", durationSeconds:50, hookType:"promise", hookText:"Dein nächster Viral-Post —", topicCategory:"algorithm", hasCta:true, isSeries:false, views:156000, likes:11200, comments:1400, shares:2900, purchases:9, status:"published" },
+    { title:"Diese Frage zerstört 90% der Creator", platform:"instagram_reel", publishedAt:"2026-05-10T20:00", durationSeconds:35, hookType:"question", hookText:"Diese Frage zerstört 90%", topicCategory:"mindset", hasCta:false, isSeries:false, views:45000, likes:3200, comments:480, shares:670, purchases:0, status:"published" },
+    { title:"Die meisten Creator hören nach 3 Monaten auf", platform:"tiktok", publishedAt:"2026-05-12T17:30", durationSeconds:44, hookType:"shock", hookText:"Die meisten Creator hören nach", topicCategory:"mindset", hasCta:true, isSeries:false, views:234000, likes:16800, comments:2200, shares:4500, purchases:11, status:"published" },
+    { title:"6 Tools die ich als Creator täglich nutze", platform:"youtube_short", publishedAt:"2026-05-13T14:00", durationSeconds:59, hookType:"number", hookText:"6 Tools die ich als", topicCategory:"skills", hasCta:true, isSeries:false, views:78000, likes:5600, comments:720, shares:1300, purchases:4, status:"published" },
+    { title:"Number Hook + Money Draft", platform:"tiktok", publishedAt:"2026-05-20T18:00", durationSeconds:45, hookType:"number", hookText:"3 Wege um als Creator", topicCategory:"money", hasCta:true, isSeries:false, views:0, likes:0, comments:0, shares:0, purchases:null, status:"draft" },
+  ];
+
+  const avgViews = seed.filter(p=>p.status==="published").reduce((s,p)=>s+p.views,0) /
+                   seed.filter(p=>p.status==="published").length;
+
+  posts = seed.map((p, i) => {
+    const eng = p.views > 0 ? (p.likes + p.comments + p.shares) / p.views : 0;
+    const score = p.status === "draft" ? 0 : Math.round(Math.min(100,
+      (p.views / avgViews) * 50 + eng * 30 + ((p.purchases||0) > 0 ? 20 : 0)
+    ));
+    const d = new Date(p.publishedAt);
+    const jsDay = d.getDay();
+    return { ...p, id: "post_" + i, engagementRate: eng, hookScore: score, weekday: jsDay === 0 ? 6 : jsDay - 1 };
+  });
+
+  save();
+}
+
+function save() { localStorage.setItem("creator_posts", JSON.stringify(posts)); }
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n >= 1e6) return (n/1e6).toFixed(1)+"M";
+  if (n >= 1000) return Math.round(n/1000)+"K";
+  return String(n);
+}
+
+function scoreColor(s) {
+  return s >= 70 ? "#22c55e" : s >= 40 ? "#eab308" : "#ef4444";
+}
+
+function scoreBadgeHTML(score) {
+  const c = scoreColor(score);
+  return `<span class="score-badge" style="background:${c}20;color:${c};border:1px solid ${c}40;">${score}</span>`;
+}
+
+function tagHTML(t) { return `<span class="tag">${t}</span>`; }
+
+// ─── ENGINE ───────────────────────────────────────────────────────────────────
+function computePatterns() {
+  const pub = posts.filter(p => p.status === "published");
+  if (pub.length < 15) return { repeat: [], avoid: [] };
+
+  function group(keyFn, dim) {
+    const g = {};
+    for (const p of pub) {
+      const k = keyFn(p);
+      if (!g[k]) g[k] = { scores: [], best: p.title, bestScore: -1 };
+      g[k].scores.push(p.hookScore);
+      if (p.hookScore > g[k].bestScore) { g[k].bestScore = p.hookScore; g[k].best = p.title; }
+    }
+    return Object.entries(g).map(([value, d]) => ({
+      dimension: dim, value,
+      avg_hook_score: Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length),
+      post_count: d.scores.length,
+      sample_post_title: d.best
+    })).filter(x => x.post_count >= 2);
+  }
+
+  const durBucket = p => p.durationSeconds <= 30 ? "≤30s" : p.durationSeconds <= 60 ? "31–60s" : p.durationSeconds <= 180 ? "1–3min" : ">3min";
+
+  const all = [
+    ...group(p => p.hookType, "hook_type"),
+    ...group(p => p.topicCategory, "topic_category"),
+    ...group(p => WEEKDAYS[p.weekday] || p.weekday, "weekday"),
+    ...group(p => p.platform, "platform"),
+    ...group(durBucket, "duration"),
+  ].sort((a,b) => b.avg_hook_score - a.avg_hook_score);
+
+  return { repeat: all.slice(0,3), avoid: [...all].reverse().slice(0,3) };
+}
+
+function computeSlots() {
+  const pub = posts.filter(p => p.status === "published");
+  const g = {};
+  for (const p of pub) {
+    const h = new Date(p.publishedAt).getHours();
+    const k = `${p.weekday}-${h}`;
+    if (!g[k]) g[k] = { scores: [], weekday: p.weekday, hour: h };
+    g[k].scores.push(p.hookScore);
+  }
+  return Object.values(g).map(d => ({
+    weekday: d.weekday, hour: d.hour,
+    avg_score: Math.round(d.scores.reduce((a,b)=>a+b,0)/d.scores.length),
+    sample_size: d.scores.length
+  })).sort((a,b) => b.avg_score - a.avg_score).slice(0,3);
+}
+
+function slotLabel(slot) {
+  const DAYS = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+  const pad = n => String(n).padStart(2,"0");
+  return `${DAYS[slot.weekday]} ${pad(slot.hour)}:00–${pad(slot.hour+1)}:00`;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render() {
+  const pub = posts.filter(p => p.status === "published");
+  const drafts = posts.filter(p => p.status === "draft");
+  const ranked = [...pub].sort((a,b) => b.hookScore - a.hookScore);
+  const patterns = computePatterns();
+  const slots = computeSlots();
+  const topSlot = slots[0] || null;
+  const topPattern = patterns.repeat[0] || null;
+  const topDraft = drafts[0] || null;
+
+  // Header
+  document.getElementById("header-meta").textContent = `${pub.length} Posts · ${drafts.length} Drafts`;
+
+  // Zone 1
+  if (topSlot) document.getElementById("next-slot-hint").textContent = "Optimaler Slot: " + slotLabel(topSlot);
+  let actionTitle, actionReason, actionBtnText, actionDraftId = null;
+
+  if (posts.length === 0) {
+    actionTitle = "Ersten Post erfassen";
+    actionReason = "Füge deinen ersten Post hinzu, um Empfehlungen zu erhalten.";
+    actionBtnText = "Neuen Post erstellen →";
+  } else if (topDraft && topPattern && topDraft.hookType === topPattern.value) {
+    actionTitle = topDraft.title;
+    actionReason = `"${topDraft.hookType}"-Hooks performen gerade stark — Ø Score ${topPattern.avg_hook_score}`;
+    actionBtnText = "Draft öffnen →";
+    actionDraftId = topDraft.id;
+  } else if (topDraft) {
+    actionTitle = topDraft.title;
+    actionReason = topPattern
+      ? `Dein stärkstes Muster ist "${topPattern.value}" (${DIM_LABEL[topPattern.dimension]}), nicht "${topDraft.hookType}"`
+      : "Noch keine Muster — füge mehr Posts hinzu";
+    actionBtnText = "Draft öffnen →";
+    actionDraftId = topDraft.id;
+  } else if (topPattern) {
+    const bestTopic = ranked[0]?.topicCategory || "bestes Thema";
+    actionTitle = `${topPattern.value}-Hook + ${bestTopic}`;
+    actionReason = `"${topPattern.value}" ist dein stärkstes Muster mit Ø Score ${topPattern.avg_hook_score}`;
+    actionBtnText = "Neuen Draft erstellen →";
+  } else {
+    actionTitle = "Mehr Posts erfassen";
+    actionReason = "Füge mindestens 15 veröffentlichte Posts hinzu für Muster-Analysen.";
+    actionBtnText = "Neuen Post erstellen →";
+  }
+
+  document.getElementById("action-title").textContent = actionTitle;
+  document.getElementById("action-reason").textContent = actionReason;
+  document.getElementById("action-btn").textContent = actionBtnText;
+  document.getElementById("action-btn").dataset.draftId = actionDraftId || "";
+
+  if (topSlot) {
+    document.getElementById("action-slot-info").textContent =
+      `${WEEKDAYS[topSlot.weekday]}, ${String(topSlot.hour).padStart(2,"0")}:00 Uhr · ${topSlot.sample_size} Posts als Basis`;
+  }
+
+  // Zone 2
+  const pEl = document.getElementById("patterns-content");
+  if (pub.length < 15) {
+    const needed = 15 - pub.length;
+    const pct = (pub.length / 15) * 100;
+    pEl.innerHTML = `
+      <div class="onboarding-hint">
+        <p>🔍 Noch ${needed} Posts bis zu deinen ersten Mustern</p>
+        <small>Du hast ${pub.length} / 15 veröffentlichte Posts</small>
+        <div class="progress-bar-outer"><div class="progress-bar-inner" style="width:${pct}%"></div></div>
+      </div>`;
+  } else {
+    const col = (arr, positive) => arr.map(p => {
+      const c = positive ? "#22c55e" : "#ef4444";
+      const pct = Math.min(100, p.avg_hook_score);
+      return `
+        <div class="pattern-item ${positive?"positive":"negative"}">
+          <div class="pattern-top">
+            <div><span class="pattern-name">${p.value}</span><span class="pattern-dim">${DIM_LABEL[p.dimension]||p.dimension}</span></div>
+            <span class="pattern-score ${positive?"positive":"negative"}">Ø ${p.avg_hook_score}</span>
+          </div>
+          <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${c};"></div></div>
+          <div class="pattern-meta">
+            <span>${p.post_count}x genutzt</span>
+            <span class="pattern-example">z.B. "${p.sample_post_title}"</span>
+          </div>
+        </div>`;
+    }).join("");
+    pEl.innerHTML = `
+      <div class="patterns-grid">
+        <div class="pattern-col positive">
+          <h3>✅ Wiederhole das</h3>
+          ${col(patterns.repeat, true) || '<p style="color:#6b6b80;font-size:13px;">Nicht genug Daten</p>'}
+        </div>
+        <div class="pattern-col negative">
+          <h3>❌ Vermeide das</h3>
+          ${col(patterns.avoid, false) || '<p style="color:#6b6b80;font-size:13px;">Nicht genug Daten</p>'}
+        </div>
+      </div>`;
+  }
+
+  // Zone 3
+  const rl = document.getElementById("ranking-list");
+  if (ranked.length === 0) {
+    rl.innerHTML = `<div class="onboarding-hint"><p>Noch keine Posts vorhanden.</p><small><a onclick="openNewPost()" style="color:#3b82f6;cursor:pointer;">Ersten Post erfassen →</a></small></div>`;
+  } else {
+    rl.innerHTML = ranked.slice(0,10).map((p, i) => {
+      const isTop = i < 3, isBot = i >= ranked.length - 3 && ranked.length > 3 && i >= 3;
+      const rankClass = isTop ? "top" : isBot ? "bottom" : "";
+      const numClass = isTop ? "top" : isBot ? "bottom" : "mid";
+      return `
+        <div class="ranking-row ${rankClass}" onclick="openDetail('${p.id}')">
+          <span class="rank-num ${numClass}">#${i+1}</span>
+          <div class="rank-info">
+            <div class="rank-title">${p.title}</div>
+            <div class="rank-tags">
+              ${tagHTML(PLATFORMS[p.platform]||p.platform)}
+              ${tagHTML(p.hookType)}
+              ${tagHTML(p.topicCategory)}
+            </div>
+          </div>
+          <div class="rank-metrics">
+            <div class="rank-views"><div class="num">${fmt(p.views)}</div><div class="lbl">Views</div></div>
+            ${scoreBadgeHTML(p.hookScore)}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  // Zone 4
+  const totalViews = pub.reduce((s,p)=>s+p.views,0);
+  const avgEng = pub.length ? (pub.reduce((s,p)=>s+p.engagementRate,0)/pub.length*100).toFixed(2) : "0.00";
+  const totalPurchases = pub.reduce((s,p)=>s+(p.purchases||0),0);
+
+  document.getElementById("analytics-grid").innerHTML = [
+    { label:"Gesamt Views", value:fmt(totalViews), ctx:`${pub.length} Posts` },
+    { label:"Ø Engagement", value:`${avgEng}%`, ctx:"Likes + Comments + Shares / Views" },
+    { label:"Verkäufe", value:String(totalPurchases), ctx:"Summe über alle Posts" },
+    { label:"Optimale Slots", value:String(slots.length), ctx: topSlot ? slotLabel(topSlot) : "—" },
+  ].map(c => `
+    <div class="analytic-card">
+      <div class="lbl">${c.label}</div>
+      <div class="val">${c.value}</div>
+      <div class="ctx">${c.ctx}</div>
+    </div>`).join("");
+
+  document.getElementById("slots-list").innerHTML = slots.length ? `
+    <div class="lbl">Optimale Posting-Zeiten</div>
+    ${slots.map((s,i) => `
+      <div class="slot-row">
+        <span class="name">#${i+1} ${slotLabel(s)}</span>
+        <div class="meta"><span>${s.sample_size} Posts</span>${scoreBadgeHTML(s.avg_score)}</div>
+      </div>`).join("")}` : "";
+}
+
+// ─── INTERACTIONS ─────────────────────────────────────────────────────────────
+function handleActionBtn() {
+  const draftId = document.getElementById("action-btn").dataset.draftId;
+  if (draftId) openDetail(draftId);
+  else openNewPost();
+}
+
+function openNewPost() {
+  const now = new Date();
+  const local = new Date(now - now.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+  document.querySelector('[name=publishedAt]').value = local;
+  document.getElementById("modal-new").classList.add("open");
+}
+function closeNewPost() { document.getElementById("modal-new").classList.remove("open"); }
+
+function toggleSeries(el) {
+  document.getElementById("series-field").style.display = el.checked ? "block" : "none";
+}
+
+function submitPost(e) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const views = parseInt(fd.get("views")) || 0;
+  const likes = parseInt(fd.get("likes")) || 0;
+  const comments = parseInt(fd.get("comments")) || 0;
+  const shares = parseInt(fd.get("shares")) || 0;
+  const purchases = fd.get("purchases") ? parseInt(fd.get("purchases")) : null;
+  const pubAt = new Date(fd.get("publishedAt"));
+  const jsDay = pubAt.getDay();
+  const eng = views > 0 ? (likes + comments + shares) / views : 0;
+  const pub30 = posts.filter(p => p.status==="published");
+  const avgV = pub30.length ? pub30.reduce((s,p)=>s+p.views,0)/pub30.length : 1;
+  const score = fd.get("status")==="draft" ? 0 : Math.round(Math.min(100,
+    (views/avgV)*50 + eng*30 + ((purchases||0)>0?20:0)
+  ));
+
+  const post = {
+    id: "post_" + Date.now(),
+    title: fd.get("title"),
+    platform: fd.get("platform"),
+    publishedAt: fd.get("publishedAt"),
+    weekday: jsDay===0?6:jsDay-1,
+    durationSeconds: parseInt(fd.get("durationSeconds")) || 0,
+    hookType: fd.get("hookType"),
+    hookText: fd.get("hookText") || "",
+    topicCategory: fd.get("topicCategory"),
+    hasCta: fd.get("hasCta") === "on",
+    isSeries: fd.get("isSeries") === "on",
+    seriesName: fd.get("seriesName") || null,
+    views, likes, comments, shares, purchases,
+    linkClicks: fd.get("linkClicks") ? parseInt(fd.get("linkClicks")) : null,
+    engagementRate: eng,
+    hookScore: score,
+    status: fd.get("status"),
+  };
+
+  posts.unshift(post);
+  save();
+  closeNewPost();
+  e.target.reset();
+  render();
+}
+
+function openDetail(id) {
+  const p = posts.find(x => x.id === id);
+  if (!p) return;
+  const c = scoreColor(p.hookScore);
+  const d = new Date(p.publishedAt);
+  const statusClass = p.status === "published" ? "status-published" : p.status === "draft" ? "status-draft" : "status-scheduled";
+
+  document.getElementById("detail-content").innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <span class="status-badge ${statusClass}">${p.status}</span>
+    </div>
+    <h2 style="margin-bottom:8px;">${p.title}</h2>
+    <p style="color:#6b6b80;font-size:14px;margin-bottom:24px;">
+      ${PLATFORMS[p.platform]||p.platform} · ${WEEKDAYS[p.weekday]}, ${d.toLocaleDateString("de-DE")} um ${d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})} Uhr
+    </p>
+    <div class="detail-score" style="background:${c}15;border:1px solid ${c}40;">
+      <div>
+        <div style="font-size:11px;color:#6b6b80;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Hook Score</div>
+        <div class="big" style="color:${c};">${p.hookScore}</div>
+        <div class="sub">von 100</div>
+      </div>
+      <div style="flex:1;">
+        <div class="score-bar-bg"><div class="score-bar-fill" style="width:${p.hookScore}%;background:${c};"></div></div>
+        <div style="margin-top:12px;font-size:13px;color:#9ca3af;">
+          Engagement Rate: <strong style="color:#e8e8f0;">${(p.engagementRate*100).toFixed(2)}%</strong>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      ${[["Views",fmt(p.views)],["Likes",fmt(p.likes)],["Kommentare",fmt(p.comments)],["Shares",fmt(p.shares)],["Link Clicks",p.linkClicks!=null?fmt(p.linkClicks):"—"],["Käufe",p.purchases!=null?p.purchases:"—"]]
+        .map(([l,v])=>`<div class="metric-box"><div class="lbl">${l}</div><div class="val">${v}</div></div>`).join("")}
+    </div>
+    <div class="detail-info">
+      <h3>Inhalt</h3>
+      <div class="detail-fields">
+        ${[["Hook-Typ",p.hookType],["Thema",p.topicCategory],["Hook-Text",p.hookText||"—"],["Dauer",p.durationSeconds?p.durationSeconds+"s":"—"],["Hat CTA",p.hasCta?"Ja":"Nein"],["Serie",p.isSeries?(p.seriesName||"Ja"):"Nein"]]
+          .map(([l,v])=>`<div class="detail-field"><div class="lbl">${l}</div><div class="val">${v}</div></div>`).join("")}
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:20px;">
+      <button onclick="deletePost('${p.id}')" style="background:#1f0a0a;border:1px solid #ef444440;color:#ef4444;padding:10px 20px;border-radius:8px;font-size:14px;">Post löschen</button>
+      <button onclick="closeDetail()" style="background:#1a1a24;border:none;color:#6b6b80;padding:10px 20px;border-radius:8px;font-size:14px;">Schließen</button>
+    </div>`;
+
+  document.getElementById("modal-detail").classList.add("open");
+}
+
+function closeDetail() { document.getElementById("modal-detail").classList.remove("open"); }
+
+function deletePost(id) {
+  if (!confirm("Post wirklich löschen?")) return;
+  posts = posts.filter(p => p.id !== id);
+  save();
+  closeDetail();
+  render();
+}
+
+// Close modals on backdrop click
+document.querySelectorAll(".modal-overlay").forEach(el => {
+  el.addEventListener("click", e => { if (e.target === el) el.classList.remove("open"); });
+});
+
+render();
+</script>
+</body>
+</html>
