@@ -1,0 +1,26 @@
+-- CreateTable
+CREATE TABLE "Post" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "title" TEXT NOT NULL,
+    "platform" TEXT NOT NULL,
+    "publishedAt" DATETIME NOT NULL,
+    "weekday" INTEGER NOT NULL,
+    "durationSeconds" INTEGER NOT NULL,
+    "hookType" TEXT NOT NULL,
+    "hookText" TEXT NOT NULL,
+    "topicCategory" TEXT NOT NULL,
+    "hasCta" BOOLEAN NOT NULL DEFAULT false,
+    "isSeries" BOOLEAN NOT NULL DEFAULT false,
+    "seriesName" TEXT,
+    "views" INTEGER NOT NULL DEFAULT 0,
+    "likes" INTEGER NOT NULL DEFAULT 0,
+    "comments" INTEGER NOT NULL DEFAULT 0,
+    "shares" INTEGER NOT NULL DEFAULT 0,
+    "linkClicks" INTEGER,
+    "purchases" INTEGER,
+    "hookScore" REAL NOT NULL DEFAULT 0,
+    "engagementRate" REAL NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL DEFAULT 'published',
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" DATETIME NOT NULL
+);
