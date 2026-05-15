@@ -6,6 +6,17 @@ datasource db {
   provider = "sqlite"
 }
 
+model Channel {
+  id             String   @id @default("default")
+  name           String   @default("")
+  niche          String   @default("")
+  platform       String   @default("tiktok")
+  targetAudience String   @default("")
+  style          String   @default("")
+  goal           String   @default("")
+  updatedAt      DateTime @updatedAt
+}
+
 model Post {
   id              String   @id @default(cuid())
   title           String

@@ -111,17 +111,42 @@ export default async function Dashboard() {
             {published.length} Posts · {drafts.length} Drafts
           </p>
         </div>
-        <Link href="/posts/new" style={{
-          background: "#3b82f6",
-          color: "#fff",
-          padding: "10px 20px",
-          borderRadius: 8,
-          textDecoration: "none",
-          fontSize: 14,
-          fontWeight: 600,
-        }}>
-          + Neuer Post
-        </Link>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Link href="/settings" style={{
+            background: "#1a1a24",
+            color: "#6b6b80",
+            padding: "10px 16px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontSize: 14,
+            border: "1px solid #2a2a38",
+          }}>
+            ⚙ Kanal
+          </Link>
+          <Link href="/content-lab" style={{
+            background: "#8b5cf620",
+            color: "#8b5cf6",
+            padding: "10px 16px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontSize: 14,
+            fontWeight: 600,
+            border: "1px solid #8b5cf640",
+          }}>
+            🧪 Content Lab
+          </Link>
+          <Link href="/posts/new" style={{
+            background: "#3b82f6",
+            color: "#fff",
+            padding: "10px 20px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontSize: 14,
+            fontWeight: 600,
+          }}>
+            + Post
+          </Link>
+        </div>
       </div>
 
       {/* ZONE 1 — Next Action */}
