@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "ts-node --project tsconfig.seed.json prisma/seed.ts"
+    "db:reset": "node -e \"const D=require('better-sqlite3');const db=new D('./dev.db');db.prepare('DELETE FROM Post').run();db.prepare('DELETE FROM Channel').run();console.log('DB reset: all posts and channel data deleted');\""
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.96.0",
