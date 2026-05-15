@@ -28,6 +28,16 @@ const EMPTY: Channel = {
   goal: "",
 };
 
+const CARD: React.CSSProperties = {
+  background: "rgba(255,255,255,0.78)",
+  backdropFilter: "blur(24px) saturate(1.4)",
+  WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+  border: "1px solid rgba(255,255,255,0.65)",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+  borderRadius: 12,
+  padding: "20px",
+};
+
 export default function SettingsPage() {
   const [form, setForm] = useState<Channel>(EMPTY);
   const [saving, setSaving] = useState(false);
@@ -47,9 +57,7 @@ export default function SettingsPage() {
           goal: data.goal ?? "",
         });
       })
-      .catch(() => {
-        // Can't load existing settings — start with empty form, still usable
-      });
+      .catch(() => {});
   }, []);
 
   const set =
@@ -80,12 +88,12 @@ export default function SettingsPage() {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "32px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 8 }}>
-        <Link href="/" style={{ color: "#6b6b80", textDecoration: "none", fontSize: 14 }}>
+        <Link href="/" style={{ color: "#71717a", textDecoration: "none", fontSize: 14 }}>
           ← Dashboard
         </Link>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Kanal-Einstellungen</h1>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#18181b" }}>Kanal-Einstellungen</h1>
       </div>
-      <p style={{ color: "#6b6b80", fontSize: 14, marginBottom: 32, marginLeft: 0 }}>
+      <p style={{ color: "#71717a", fontSize: 14, marginBottom: 32 }}>
         Diese Infos werden genutzt um Content-Ideen und Scripts speziell für deinen Kanal zu generieren.
       </p>
 
@@ -140,11 +148,11 @@ export default function SettingsPage() {
         {error && (
           <div
             style={{
-              background: "#1f0a0a",
-              border: "1px solid #ef4444",
+              background: "#fef2f2",
+              border: "1px solid rgba(220,38,38,0.25)",
               borderRadius: 8,
               padding: "12px 16px",
-              color: "#ef4444",
+              color: "#dc2626",
               fontSize: 14,
             }}
           >
@@ -157,7 +165,7 @@ export default function SettingsPage() {
             type="submit"
             disabled={saving}
             style={{
-              background: "#3b82f6",
+              background: "#2563eb",
               color: "#fff",
               padding: "12px 28px",
               borderRadius: 8,
@@ -166,11 +174,12 @@ export default function SettingsPage() {
               opacity: saving ? 0.6 : 1,
               border: "none",
               cursor: saving ? "default" : "pointer",
+              boxShadow: "0 2px 8px rgba(37,99,235,0.25)",
             }}
           >
             {saving ? "Speichern…" : "Einstellungen speichern"}
           </button>
-          {saved && <span style={{ color: "#22c55e", fontSize: 14, fontWeight: 600 }}>✓ Gespeichert</span>}
+          {saved && <span style={{ color: "#16a34a", fontSize: 14, fontWeight: 600 }}>✓ Gespeichert</span>}
         </div>
       </form>
     </div>
@@ -179,10 +188,20 @@ export default function SettingsPage() {
 
 function Fieldset({ legend, children }: { legend: string; children: React.ReactNode }) {
   return (
-    <fieldset style={{ border: "1px solid #2a2a38", borderRadius: 10, padding: "20px" }}>
+    <fieldset
+      style={{
+        background: "rgba(255,255,255,0.78)",
+        backdropFilter: "blur(24px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+        border: "1px solid rgba(255,255,255,0.65)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+        borderRadius: 10,
+        ...CARD,
+      }}
+    >
       <legend
         style={{
-          color: "#6b6b80",
+          color: "#a1a1aa",
           fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
@@ -204,7 +223,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
         style={{
           display: "block",
           fontSize: 12,
-          color: "#9ca3af",
+          color: "#71717a",
           marginBottom: 6,
           fontWeight: 500,
         }}

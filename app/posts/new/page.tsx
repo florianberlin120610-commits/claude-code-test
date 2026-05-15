@@ -28,6 +28,25 @@ const STATUSES = [
   { value: "scheduled", label: "Geplant" },
 ];
 
+const CARD: React.CSSProperties = {
+  background: "rgba(255,255,255,0.78)",
+  backdropFilter: "blur(24px) saturate(1.4)",
+  WebkitBackdropFilter: "blur(24px) saturate(1.4)",
+  border: "1px solid rgba(255,255,255,0.65)",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
+  borderRadius: 10,
+  padding: "20px",
+};
+
+const LEGEND: React.CSSProperties = {
+  color: "#a1a1aa",
+  fontSize: 12,
+  fontWeight: 600,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+  padding: "0 8px",
+};
+
 export default function NewPostPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -88,17 +107,14 @@ export default function NewPostPage() {
   return (
     <div style={{ maxWidth: 640, margin: "0 auto", padding: "32px 20px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 32 }}>
-        <Link href="/" style={{ color: "#6b6b80", textDecoration: "none", fontSize: 14 }}>← Dashboard</Link>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>Neuer Post</h1>
+        <Link href="/" style={{ color: "#71717a", textDecoration: "none", fontSize: 14 }}>← Dashboard</Link>
+        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "#18181b" }}>Neuer Post</h1>
       </div>
 
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-        {/* Basisdaten */}
-        <fieldset style={{ border: "1px solid #2a2a38", borderRadius: 10, padding: "20px" }}>
-          <legend style={{ color: "#6b6b80", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, padding: "0 8px" }}>
-            Basisdaten
-          </legend>
+        <fieldset style={CARD}>
+          <legend style={LEGEND}>Basisdaten</legend>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <Field label="Titel *">
               <input required value={form.title} onChange={set("title")} placeholder="z.B. 5 Fehler die dich arm halten" />
@@ -126,11 +142,8 @@ export default function NewPostPage() {
           </div>
         </fieldset>
 
-        {/* Hook */}
-        <fieldset style={{ border: "1px solid #2a2a38", borderRadius: 10, padding: "20px" }}>
-          <legend style={{ color: "#6b6b80", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, padding: "0 8px" }}>
-            Hook
-          </legend>
+        <fieldset style={CARD}>
+          <legend style={LEGEND}>Hook</legend>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Field label="Hook-Typ *">
@@ -150,11 +163,8 @@ export default function NewPostPage() {
           </div>
         </fieldset>
 
-        {/* Metriken */}
-        <fieldset style={{ border: "1px solid #2a2a38", borderRadius: 10, padding: "20px" }}>
-          <legend style={{ color: "#6b6b80", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, padding: "0 8px" }}>
-            Metriken
-          </legend>
+        <fieldset style={CARD}>
+          <legend style={LEGEND}>Metriken</legend>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Field label="Views">
               <input type="number" value={form.views} onChange={set("views")} placeholder="0" min={0} />
@@ -177,18 +187,15 @@ export default function NewPostPage() {
           </div>
         </fieldset>
 
-        {/* Extras */}
-        <fieldset style={{ border: "1px solid #2a2a38", borderRadius: 10, padding: "20px" }}>
-          <legend style={{ color: "#6b6b80", fontSize: 12, fontWeight: 600, textTransform: "uppercase", letterSpacing: 1, padding: "0 8px" }}>
-            Extras
-          </legend>
+        <fieldset style={CARD}>
+          <legend style={LEGEND}>Extras</legend>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div style={{ display: "flex", gap: 24 }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#e8e8f0" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#18181b", fontSize: 14 }}>
                 <input type="checkbox" checked={form.hasCta} onChange={set("hasCta")} />
                 Hat CTA
               </label>
-              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#e8e8f0" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#18181b", fontSize: 14 }}>
                 <input type="checkbox" checked={form.isSeries} onChange={set("isSeries")} />
                 Teil einer Serie
               </label>
@@ -202,30 +209,32 @@ export default function NewPostPage() {
         </fieldset>
 
         {error && (
-          <div style={{ background: "#1f0a0a", border: "1px solid #ef4444", borderRadius: 8, padding: "12px 16px", color: "#ef4444", fontSize: 14 }}>
+          <div style={{ background: "#fef2f2", border: "1px solid rgba(220,38,38,0.25)", borderRadius: 8, padding: "12px 16px", color: "#dc2626", fontSize: 14 }}>
             {error}
           </div>
         )}
 
         <div style={{ display: "flex", gap: 12 }}>
           <button type="submit" disabled={loading} style={{
-            background: "#3b82f6",
+            background: "#2563eb",
             color: "#fff",
             padding: "12px 28px",
             borderRadius: 8,
             fontSize: 15,
             fontWeight: 600,
             opacity: loading ? 0.6 : 1,
+            boxShadow: "0 2px 8px rgba(37,99,235,0.25)",
           }}>
             {loading ? "Speichern…" : "Post speichern"}
           </button>
           <Link href="/" style={{
-            background: "#1a1a24",
-            color: "#6b6b80",
+            background: "rgba(255,255,255,0.7)",
+            color: "#71717a",
             padding: "12px 20px",
             borderRadius: 8,
             fontSize: 15,
             textDecoration: "none",
+            border: "1px solid rgba(0,0,0,0.08)",
           }}>
             Abbrechen
           </Link>
@@ -238,7 +247,7 @@ export default function NewPostPage() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label>{label}</label>
+      <label style={{ display: "block", fontSize: 12, color: "#71717a", marginBottom: 6, fontWeight: 500 }}>{label}</label>
       {children}
     </div>
   );
